@@ -83,3 +83,39 @@ print(introduction)
 print(f"\nWord count: {len(introduction.split())}")
 print(f"\n{'='*60}\n")
 
+# Chain 3: Develop main content sections
+content_template = ChatPromptTemplate.from_messages([
+    ("system", """You are a technical content writer with deep expertise in software development.
+    Write detailed, accurate, and engaging content sections."""),
+    ("human", """Write the main content based on this outline and introduction:
+
+    OUTLINE:
+    {outline}
+
+    INTRODUCTION:
+    {introduction}
+
+    Requirements:
+    - Cover all key points from outline
+    - Approximately 700-800 words
+    - Include specific examples and code snippets where relevant
+    - Use subheadings for each major section
+    - Maintain {tone} tone
+    - Target audience: {audience}""")
+])
+
+content_chain = content_template | model | StrOutputParser()
+
+# Test main content
+print("=== STEP 3: CREATING MAIN CONTENT ===")
+main_content = content_chain.invoke({
+    "outline": outline,
+    "introduction": introduction,
+    "tone": ARTICLE_CONFIG["tone"],
+    "audience": ARTICLE_CONFIG["target_audience"]
+})
+
+print(main_content)
+print(f"\nWord count: {len(main_content.split())}")
+print(f"\n{'='*60}\n")
+
