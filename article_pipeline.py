@@ -51,3 +51,35 @@ outline = outline_chain.invoke({
 
 print(outline)
 print(f"\n{'='*60}\n")
+
+# Chain 2: Write compelling introduction
+intro_template = ChatPromptTemplate.from_messages([
+    ("system", """You are a skilled technical writer known for engaging openings.
+    Write introductions that hook readers immediately."""),
+    ("human", """Based on this outline, write a compelling introduction (200-250 words):
+
+    OUTLINE:
+    {outline}
+
+    Requirements:
+    - Start with a surprising statistic or provocative question
+    - Establish relevance to {audience}
+    - Preview the main points without spoilers
+    - End with a smooth transition to content
+    - Use {tone} tone""")
+])
+
+intro_chain = intro_template | model | StrOutputParser()
+
+# Test introduction
+print("=== STEP 2: WRITING INTRODUCTION ===")
+introduction = intro_chain.invoke({
+    "outline": outline,
+    "audience": ARTICLE_CONFIG["target_audience"],
+    "tone": ARTICLE_CONFIG["tone"]
+})
+
+print(introduction)
+print(f"\nWord count: {len(introduction.split())}")
+print(f"\n{'='*60}\n")
+
