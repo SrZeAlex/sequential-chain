@@ -17,3 +17,37 @@ ARTICLE_CONFIG = {
     "word_count": 1200,
     "tone": "informative yet conversational"
 }
+
+# Chain 1: Generate article outline
+outline_template = ChatPromptTemplate.from_messages([
+    ("system", """You are an expert content strategist for technical blogs.
+    Create well-structured article outlines that flow logically."""),
+    ("human", """Create a detailed outline for an article:
+
+    Topic: {topic}
+    Target Audience: {audience}
+    Target Length: {word_count} words
+    Tone: {tone}
+
+    Outline Format:
+    1. Hook (what grabs attention)
+    2. Key Points (3-4 main sections with subpoints)
+    3. Examples/Case Studies needed
+    4. Conclusion focus
+
+    Make it specific and actionable.""")
+])
+
+outline_chain = outline_template | model | StrOutputParser()
+
+# Test outline generation
+print("=== STEP 1: GENERATING OUTLINE ===")
+outline = outline_chain.invoke({
+    "topic": ARTICLE_CONFIG["topic"],
+    "audience": ARTICLE_CONFIG["target_audience"],
+    "word_count": ARTICLE_CONFIG["word_count"],
+    "tone": ARTICLE_CONFIG["tone"]
+})
+
+print(outline)
+print(f"\n{'='*60}\n")
