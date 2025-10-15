@@ -6,7 +6,7 @@ import os
 # Initialize model
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash-exp",
-    google_api_key=os.environ.get("GOOGLE_API_KEY"),
+    google_api_key=os.environ.get("OPENROUTER_API_KEY"),
     temperature=0.7  # Balanced creativity
 )
 
