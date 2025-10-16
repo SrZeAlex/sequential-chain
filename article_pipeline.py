@@ -6,7 +6,7 @@ import os
 # Initialize model
 model = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash-exp",
-    google_api_key=os.environ.get("OPENROUTER_API_KEY"),
+    google_api_key=os.environ.get("GOOGLE_API_KEY"),
     temperature=0.7  # Balanced creativity
 )
 
@@ -119,3 +119,57 @@ print(main_content)
 print(f"\nWord count: {len(main_content.split())}")
 print(f"\n{'='*60}\n")
 
+# Chain 4: Write conclusion
+conclusion_template = ChatPromptTemplate.from_messages([
+    ("system", """You are a technical writer who crafts memorable conclusions.
+    Leave readers with clear takeaways and next steps."""),
+    ("human", """Write a strong conclusion (150-200 words) for this article:
+
+    OUTLINE:
+    {outline}
+
+    MAIN CONTENT SUMMARY:
+    {content_preview}
+
+    Requirements:
+    - Summarize key insights without repeating
+    - Provide actionable next steps
+    - End with a forward-looking statement
+    - Maintain {tone} tone""")
+])
+
+conclusion_chain = conclusion_template | model | StrOutputParser()
+
+# Test conclusion (use first 500 chars of content as preview)
+content_preview = main_content[:500] + "..."
+
+print("=== STEP 4: WRITING CONCLUSION ===")
+conclusion = conclusion_chain.invoke({
+    "outline": outline,
+    "content_preview": content_preview,
+    "tone": ARTICLE_CONFIG["tone"]
+})
+
+print(conclusion)
+print(f"\nWord count: {len(conclusion.split())}")
+print(f"\n{'='*60}\n")
+
+# Combine all pieces
+def assemble_article(intro, content, conclusion):
+    """Combine article sections with proper formatting."""
+    article = f"""{intro}
+
+{content}
+
+{conclusion}
+"""
+    return article
+
+# Create final article
+final_article = assemble_article(introduction, main_content, conclusion)
+
+print("=== COMPLETE ARTICLE ===")
+print(final_article)
+print(f"\n{'='*60}")
+print(f"Total word count: {len(final_article.split())}")
+print(f"Target was: {ARTICLE_CONFIG['word_count']}")
